@@ -15,7 +15,7 @@ def pwserver(secret, package):
                 self.wfile.write('Incorrect password.\n'.encode())
             else:
                 print('Success')
-            self.wfile.write(package.encode())
+            self.wfile.write(package.encode() + b'\n')
     return PWServer
 
 
@@ -28,7 +28,7 @@ def main(port, host):
             "Must have file secret and package present in cwd"
 
     if host == 'public':
-        host = socket.gethostbyname(socket.gethostname())
+        host = ''
 
     secret = open('secret', 'r').read().strip()
     package = open('package', 'r').read().strip()
