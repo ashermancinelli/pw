@@ -2,30 +2,21 @@
 
 import os
 import socket
+import socketserver
 import click
 import threading
 
-def handle_conn(chunk_size, secret, package):
-    def handler(conn, addr):
-        print('Accepted from ', addr)
-        try:
-            got = conn.recv(chunk_size).decode().strip()
-            print(got)
-
-            if not got:
-                conn.sendall(b'Must send secret as first message.\n')
-                raise Exception()
-
-            if got != secret:
-                conn.sendall(b'Recieved packet did not match secret.\n')
-                raise Exception()
-
-            conn.sendall(package.encode())
-
-        finally:
-            conn.close()
-
-    return handler
+def pwserver(secret, package):
+    class PWServer(socketserver.StreamRequestHandler):
+        def handle(self):
+            self.data = self.rfile.readline().strip().decode()
+            if self.data != secret:
+                print('Failure')
+                self.wfile.write('Incorrect password.\n'.encode())
+            else:
+                print('Success')
+            self.wfile.write(package.encode())
+    return PWServer
 
 
 @click.command()
@@ -37,21 +28,15 @@ def main(port, host):
             "Must have file secret and package present in cwd"
 
     if host == 'public':
-        host = socket.gethostname()
+        host = socket.gethostbyname(socket.gethostname())
 
     secret = open('secret', 'r').read().strip()
     package = open('package', 'r').read().strip()
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind((host, port))
-    sock.listen(5)
-    while True:
-        conn, addr = sock.accept()
-        t = threading.Thread(
-                target=handle_conn(256, secret, package),
-                args=(conn, addr),
-                daemon=True)
-        t.run()
+    print('Serving on', host, port)
+    server = socketserver.TCPServer((host, port), pwserver(secret, package))
+    server.serve_forever()
+
 
 if __name__ == '__main__':
     main()
