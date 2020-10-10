@@ -10,20 +10,16 @@ import click
 @click.option('--host', default='localhost')
 def main(secret, port, host):
 
-    secret = open('secret', 'r').read().strip()
-
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print('connect')
     sock.connect((host, port))
-    print('connect')
-    sock.sendall(secret.encode())
-    print('connect')
+    sock.sendall(secret.encode() + b'\n')
     ans = ''
     while True:
-        ans = sock.recv(16).strip()
-        if '\n' in ans:
+        resp = sock.recv(1)
+        if resp == b'':
             break
-    print(ans.decode())
+        ans += resp.decode()
+    print(ans.strip())
 
 if __name__ == '__main__':
     main()
