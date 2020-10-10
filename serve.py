@@ -13,8 +13,10 @@ def pwserver(secret, package):
             if self.data != secret:
                 print('Failure')
                 self.wfile.write('Incorrect password.\n'.encode())
+                raise Exception()
             else:
                 print('Success')
+            print(self.data)
             self.wfile.write(package.encode() + b'\n')
     return PWServer
 
@@ -27,14 +29,11 @@ def main(port, host):
     assert os.path.exists('secret') and os.path.exists('package'), \
             "Must have file secret and package present in cwd"
 
-    if host == 'public':
-        host = ''
-
     secret = open('secret', 'r').read().strip()
     package = open('package', 'r').read().strip()
 
     print('Serving on', host, port)
-    server = socketserver.TCPServer((host, port), pwserver(secret, package))
+    server = socketserver.TCPServer((host if host != 'public' else '', port), pwserver(secret, package))
     server.serve_forever()
 
 
