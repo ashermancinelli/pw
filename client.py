@@ -36,5 +36,7 @@ def main(port, host, secret_file, query):
             if query in k:
                 print(f'{k}: {v}')
 
+    return j
+
 if __name__ == '__main__':
     main()

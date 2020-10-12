@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import subprocess
+
+if __name__ == '__main__':
+
+    root = os.path.dirname(__file__)
+    args = list()
+
+    if 'PWHOST' in os.environ:
+        args += [ '--host', os.environ['PWHOST'] ]
+    if 'PWPORT' in os.environ:
+        args += [ '--port', os.environ['PWPORT'] ]
+    if 'PWSECRETFILE' in os.environ:
+        args += [ '--secret-file', os.environ['PWSECRETFILE'] ]
+
+    if len(sys.argv) > 1:
+        args += [ '--query', sys.argv[1] ]
+
+    print(args)
+    subprocess.run([root + '/client.py', *args])
