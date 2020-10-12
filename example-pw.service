@@ -1,0 +1,8 @@
+[Unit]
+Description = Start password service
+
+[Service]
+ExecStart = /root/scripts/pw/serve.py --host public --port 5555 --secret-file /root/scripts/pw/secret --package-file /root/scripts/pw/package
+
+[Install]
+WantedBy = multi-user.target
