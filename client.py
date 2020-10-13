@@ -29,14 +29,15 @@ def main(port, host, secret_file, query):
 
     package = f.decrypt(ans).decode()
     j = json.loads(package)
+    ret = dict()
     if query is None:
-        print(j)
+        ret = j
     else:
         for k, v in j.items():
             if query in k:
-                print(f'{k}: {v}')
+                ret[k] = v
 
-    return j
+    print(json.dumps(ret, indent=2))
 
 if __name__ == '__main__':
     main()
