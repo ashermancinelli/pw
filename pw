@@ -16,8 +16,11 @@ if __name__ == '__main__':
     if 'PWSECRETFILE' in os.environ:
         args += [ '--secret-file', os.environ['PWSECRETFILE'] ]
 
+    if '-v' in sys.argv:
+        print(args)
+        sys.argv.remove('-v')
+
     if len(sys.argv) > 1:
         args += [ '--query', sys.argv[1] ]
 
-    print(args)
     subprocess.run([root + '/client.py', *args])
